@@ -1,0 +1,37 @@
+# Data Cleaning from BRFSS 2019 LLCP2019
+install.packages("Tidyverse")
+install.packages("rio")
+llcp2019<- import("LLCP2019.XPT")
+head(llcp2019)
+str(llcp2019)
+glimpse(llcp2019)
+colnames(llcp2019)
+export(llcp2019,"llcp2019.csv")
+llcp2019<-read.csv("llcp2019.csv",header = TRUE)
+NY2019<-filter(llcp2019,X_STATE==36)
+str(NY2019)
+glimpse(NY2019)
+colSums(is.na(NY2019))
+colSums(is.na(NY2019))==14232
+which(colSums(is.na(NY2019))==nrow(NY2019))
+drop_var<-which(colSums(is.na(NY2019))==nrow(NY2019))
+X<-NY2019[,drop_var]
+str(X)
+glimpse(X)
+NY2019dop_var<-NY2019[,-drop_var]
+str(NY2019dop_var)
+glimpse(NY2019dop_var)
+count(NY2019dop_var,vars = HLTHPLN1)
+# in case you want to drop rows 
+variabletodrop1<-which(NY2019dop_var$HLTHPLN1==7)
+variabletodrop2<-which(NY2019dop_var$HLTHPLN1==9)
+NY2019drop<-filter(NY2019dop_var[-variabletodrop1,])
+NY2019drop_var_respondent<-filter(NY2019drop[-variabletodrop1,])
+export(NY2019drop_var_respondent,"NY2019drop_var_respondent.csv")
+str(NY2019d)
+NY2019drop_var_respondent<-read.csv("NY2019drop_var_respondent.csv",header = TRUE)
+NY2019drop_var_respondent
+keep_varb<- c("X_STATE","WEIGHT2","HEIGHT3","X_SEX", "X_AGE80","X_RACE","MARITAL","X_CHISPNC","EDUCA","INCOME2","MEDCOST","HLTHPLN1","EMPLOY1","PERSDOC2")
+NY2019_PE<-NY2019drop_var_respondent[ , keep_varb]
+NY2019_lr<- NY2019drop_var_respondent%>%select(X_STATE,WEIGHT2,HEIGHT3,X_SEX, X_AGE80,X_RACE,MARITAL,X_CHISPNC,EDUCA,INCOME2,MEDCOST,HLTHPLN1,EMPLOY1,PERSDOC2)
+glimpse(NY2019_lr)
