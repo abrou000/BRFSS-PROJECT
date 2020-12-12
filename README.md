@@ -2,79 +2,10 @@
 > NY2019drop_var_respondent<-read.csv("NY2019drop_var_respondent.csv",header = TRUE)
 > NY2019_lr<- NY2019drop_var_respondent%>%select(X_STATE,WEIGHT2,HEIGHT3,X_SEX, X_AGE80,MARITAL,X_HISPANC,X_PRACE1,EDUCA,INCOME2,MEDCOST,HLTHPLN1,EMPLOY1,PERSDOC2)
 > attach(NY2019_lr)
-The following object is masked from dataforanalysis (pos = 3):
-
-    X_AGE80
-
-The following object is masked from dataforanalysis (pos = 4):
-
-    X_AGE80
-
-The following object is masked from dataforanalysis (pos = 5):
-
-    X_AGE80
-
-The following object is masked from dataforanalysis (pos = 6):
-
-    X_AGE80
-
-The following object is masked from dataforanalysis (pos = 7):
-
-    X_AGE80
-
-The following objects are masked from NY2019 (pos = 8):
-
-    EDUCA, EMPLOY1, HEIGHT3, HLTHPLN1, INCOME2, MARITAL, MEDCOST, PERSDOC2, WEIGHT2,
-    X_AGE80, X_HISPANC, X_PRACE1, X_SEX, X_STATE
-
-The following objects are masked from NY2019 (pos = 9):
-
-    EDUCA, EMPLOY1, HEIGHT3, HLTHPLN1, INCOME2, MARITAL, MEDCOST, PERSDOC2, WEIGHT2,
-    X_AGE80, X_HISPANC, X_PRACE1, X_SEX, X_STATE
-
-The following object is masked from dataforanalysis (pos = 11):
-
-    X_AGE80
-
 > usevar<- (X_AGE80>=18) & (X_AGE80<=55)
 > NY2019<-subset(NY2019_lr,usevar)
 > detach()
 > attach(NY2019)
-The following object is masked from dataforanalysis (pos = 3):
-
-    X_AGE80
-
-The following object is masked from dataforanalysis (pos = 4):
-
-    X_AGE80
-
-The following object is masked from dataforanalysis (pos = 5):
-
-    X_AGE80
-
-The following object is masked from dataforanalysis (pos = 6):
-
-    X_AGE80
-
-The following object is masked from dataforanalysis (pos = 7):
-
-    X_AGE80
-
-The following objects are masked from NY2019 (pos = 8):
-
-    EDUCA, EMPLOY1, HEIGHT3, HLTHPLN1, INCOME2, MARITAL, MEDCOST, PERSDOC2, WEIGHT2,
-    X_AGE80, X_HISPANC, X_PRACE1, X_SEX, X_STATE
-
-The following objects are masked from NY2019 (pos = 9):
-
-    EDUCA, EMPLOY1, HEIGHT3, HLTHPLN1, INCOME2, MARITAL, MEDCOST, PERSDOC2, WEIGHT2,
-    X_AGE80, X_HISPANC, X_PRACE1, X_SEX, X_STATE
-
-The following object is masked from dataforanalysis (pos = 11):
-
-    X_AGE80
-
-> detach()
 > model1<-lm(HLTHPLN1~X_AGE80+ I(X_AGE80^2) + I(INCOME2^2)+X_SEX+MARITAL+X_PRACE1+X_HISPANC +EDUCA+INCOME2 +EMPLOY1, data = NY2019)
 > summary(model1)
 
@@ -188,42 +119,6 @@ The following objects are masked from dataforanalysis (pos = 3):
     Asian, Black, BMdegr, Divorced, female, HCOV, Hired, HISPANIC, HS, Lessthan10000,
     Lessthan35000, Lessthan50000, Married, Morethan75000, NOHS, Sefemploy, Single,
     Somecol, Student, White, X_AGE80
-
-The following objects are masked from dataforanalysis (pos = 4):
-
-    Asian, Black, BMdegr, Divorced, female, HCOV, Hired, HISPANIC, HS, Lessthan10000,
-    Lessthan25000, Lessthan35000, Lessthan50000, Married, Morethan75000, NOHS,
-    Sefemploy, Single, Somecol, Student, White, X_AGE80
-
-The following objects are masked from dataforanalysis (pos = 5):
-
-    Asian, Black, BMdegr, Divorced, female, HCOV, Hired, HISPANIC, HS, Lessthan10000,
-    Lessthan25000, Lessthan35000, Lessthan50000, Married, Morethan75000, NOHS,
-    Sefemploy, Single, Somecol, Student, White, X_AGE80
-
-The following objects are masked from dataforanalysis (pos = 6):
-
-    Asian, Black, BMdegr, Divorced, female, HCOV, Hired, HISPANIC, HS, Lessthan10000,
-    Lessthan25000, Lessthan35000, Lessthan50000, Married, Morethan75000, NOHS,
-    Sefemploy, Single, Somecol, Student, White, X_AGE80
-
-The following objects are masked from NY2019 (pos = 7):
-
-    Asian, Black, BMdegr, Divorced, female, HCOV, Hired, HISPANIC, HS, Lessthan10000,
-    Lessthan25000, Lessthan35000, Lessthan50000, Married, Morethan75000, NOHS,
-    Sefemploy, Single, Somecol, Student, White, X_AGE80
-
-The following objects are masked from NY2019 (pos = 8):
-
-    Asian, Black, BMdegr, Divorced, female, HCOV, Hired, HISPANIC, HS, Lessthan10000,
-    Lessthan25000, Lessthan35000, Lessthan50000, Married, Morethan75000, NOHS,
-    Sefemploy, Single, Somecol, Student, White, X_AGE80
-
-The following objects are masked from dataforanalysis (pos = 10):
-
-    Asian, Black, BMdegr, Divorced, female, HCOV, Hired, HISPANIC, HS, Lessthan10000,
-    Lessthan25000, Lessthan35000, Lessthan50000, Married, Morethan75000, NOHS,
-    Sefemploy, Single, Somecol, Student, White, X_AGE80
 
 > require("standardize")
 > set.seed(12345)
