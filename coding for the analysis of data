@@ -1,0 +1,150 @@
+---
+title: "PRoject BRFSS"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+NY2019drop_var_respondent<-read.csv("NY2019drop_var_respondent.csv",header = TRUE)
+NY2019_lr<- NY2019drop_var_respondent%>%select(X_STATE,WEIGHT2,HEIGHT3,X_SEX, X_AGE80,MARITAL,X_HISPANC,X_PRACE1,EDUCA,INCOME2,MEDCOST,HLTHPLN1,EMPLOY1,PERSDOC2)
+attach(NY2019_lr)
+usevar<- (X_AGE80>=18) & (X_AGE80<=55)
+NY2019<-subset(NY2019_lr,usevar)
+detach()
+attach(NY2019)
+```
+
+```{r}
+model1<-lm(HLTHPLN1~X_AGE80+ I(X_AGE80^2) + I(INCOME2^2)+X_SEX+MARITAL+X_PRACE1+X_HISPANC +EDUCA+INCOME2 +EMPLOY1, data = NY2019)
+summary(model1)
+
+```
+
+
+```{r}
+NY2019$HCOV<- ifelse(NY2019$HLTHPLN1==1,1,0)
+NY2019$female<-if_else(NY2019$X_SEX==2,1,0)
+NY2019$Black<-if_else(NY2019$X_PRACE1==2,1,0)
+NY2019$White<-if_else(NY2019$X_PRACE1==1,1,0)
+NY2019$Asian<-if_else(NY2019$X_PRACE1==4,1,0)
+NY2019$HISPANIC<-if_else(NY2019$X_HISPANC==1,1,0)
+NY2019$NOHS<-if_else(NY2019$EDUCA<4,1,0)
+NY2019$HS<-if_else(NY2019$EDUCA==4,1,0)
+NY2019$Somecol<-if_else(NY2019$EDUCA==5,1,0)
+NY2019$BMdegr<-if_else(NY2019$EDUCA==6,1,0)
+NY2019$Student<-if_else(NY2019$EMPLOY1==6,1,0)
+NY2019$Sefemploy<-if_else(NY2019$EMPLOY1==2,1,0)
+NY2019$Hired<-if_else(NY2019$EMPLOY1==1,1,0)
+NY2019$Married<-if_else(NY2019$MARITAL==1,1,0)
+NY2019$Divorced<-if_else(NY2019$MARITAL==2,1,0)
+NY2019$Single<-if_else(NY2019$MARITAL==5,1,0)
+NY2019$Lessthan10000<-if_else(NY2019$INCOME2==1,1,0)
+NY2019$Lessthan25000<-if_else(NY2019$INCOME2==4,1,0)
+NY2019$Lessthan35000<-if_else(NY2019$INCOME2==5,1,0)
+NY2019$Lessthan50000<-if_else(NY2019$INCOME2==6,1,0)
+NY2019$Morethan75000<-if_else(NY2019$INCOME2==8,1,0)
+
+```
+
+```{r}
+dataforanalysis<-data.frame(NY2019$HCOV,
+                            NY2019$X_AGE80,
+                            NY2019$female,
+                            NY2019$Black,
+                            NY2019$White,
+                            NY2019$Asian,
+                            NY2019$HISPANIC,
+                            NY2019$Married,
+                            NY2019$Divorced,
+                            NY2019$Single,
+                            NY2019$NOHS,
+                            NY2019$HS,
+                            NY2019$Somecol,
+                            NY2019$BMdegr,
+                            NY2019$Student,
+                            NY2019$Sefemploy,
+                            NY2019$Hired,
+                            NY2019$Lessthan10000,
+                            NY2019$Lessthan25000,
+                            NY2019$Lessthan35000,
+                            NY2019$Lessthan50000,
+                            NY2019$Morethan75000)
+
+names(dataforanalysis)<- c("HCOV",
+                           "X_AGE80",
+                           "female",
+                           "Black",
+                           "White",
+                           "Asian",
+                           "HISPANIC",
+                           "Married",
+                           "Divorced",
+                           "Single",
+                           "NOHS",
+                           "HS",
+                           "Somecol",
+                           "BMdegr",
+                           "Student",
+                           "Sefemploy",
+                           "Hired",
+                           "Lessthan10000",
+                           "Lessthan25000",
+                           "Lessthan35000",
+                           "Lessthan50000",
+                           "Morethan75000"
+                           )
+```
+
+```{r}
+detach()
+attach(dataforanalysis)
+```
+
+```{r}
+require("standardize")
+set.seed(12345)
+NN<-length(dataforanalysis$HCOV)
+restrict_1<-(runif(NN)<0.7)
+summary(restrict_1)
+dat_train<-subset(dataforanalysis,restrict_1)
+dat_test<-subset(dataforanalysis,!restrict_1)
+sobj<-standardize(HCOV~X_AGE80+I(X_AGE80^2)+female+Black+I(female*Black)+White+Asian+HISPANIC+I(White*Lessthan25000)+I(Black*Lessthan25000) +Married+Divorced+Single+NOHS+HS + Somecol+ BMdegr+ Student+Sefemploy+Hired+Lessthan10000+Lessthan25000+Lessthan35000+Lessthan50000+Morethan75000, dat_train, family = binomial)
+s_data_test<- predict(sobj,dat_test)
+
+
+```
+
+```{r}
+#LPM
+model_lpm1<-lm(sobj$formula,  data = sobj$data)
+summary(model_lpm1)
+predi_val_lpm<-predict(model_lpm1, s_data_test)
+predi_model_lpm1<-(predi_val_lpm>0.6)
+table(pred = predi_model_lpm1, true = dat_test$HCOV)
+```
+```{r}
+#GPM
+model_logit1<-glm(sobj$formula,family= binomial,data = sobj$data)
+summary(model_logit1)
+predi_val_glm<-predict(model_logit1, s_data_test, type = "response")
+predi_model_logit1<-(predi_val_glm>0.6)
+table(pred = predi_model_logit1, true = dat_test$HCOV)
+```
+```{r}
+require("randomForest")
+set.seed(54321)
+model_randFor<- randomForest(as.factor(HCOV)~ ., data= sobj$data, importance = TRUE, proximity= TRUE)
+print(model_randFor)
+round(importance(model_randFor),2)
+varImpPlot(model_randFor)
+# lets look the confusion Matrix
+pred_model1<-predict(model_randFor, s_data_test)
+table(pred = pred_model1, true = dat_test$HCOV)
+```
+
+
+
